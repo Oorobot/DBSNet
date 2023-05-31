@@ -5,7 +5,8 @@ import torch
 from scipy import ndimage
 from torch.utils.data import Dataset
 
-# 数据增强
+
+# data augmentation
 def random_horizontal_flip(imgs: np.ndarray):
     return np.flip(imgs, -1)
 
@@ -40,7 +41,7 @@ def data_augmentation(augmentation: int, is_train: bool):
     return augmentations
 
 
-# Normalized based on dicom_window_ratio
+# based dicom_window_ratio
 def normalize(
     input: np.ndarray,
     mask: np.ndarray = None,
@@ -63,11 +64,11 @@ def normalize(
         return normalized_input
 
 
-# Based on normal hip data feature extraction
+# based normal hip
 def preprocess_based_normal_hip(
     input: np.ndarray,
     side: str = "l" or "r",
-    normal_hip_file: str = "data/normal_hip.npz",
+    normal_hip_file: str = "data/hip_roi/avg_normal_hip.npz",
 ):
     normal_hip = np.load(normal_hip_file)
     normal_hip = normal_hip["left"] if side == "l" else normal_hip["right"]
@@ -88,16 +89,14 @@ def customed_transform(
     augmentations: list = [],
     num_classes=None,
 ):
-
     if boundary is None:
-        # Normalization
         input = normalize(input, mask, dicom_window_ratio)
     else:
         if num_classes == 2:
             input = input[
                 :, boundary[0] : boundary[1] + 1, boundary[2] : boundary[3] + 1
             ]
-            # Hip data has ROI labeled data, only in 0 1 categories
+            # hip: ROI
             target = np.array(target - 1)
             input = preprocess_based_normal_hip(input, side)
         else:
@@ -134,7 +133,7 @@ class ThreePhaseBone(Dataset):
         self.num_classes = num_classes
 
     def __getitem__(self, index):
-        # DICOM has been converted to npz format
+        # medical images already were converted to npz
         file_name = self.file_list[index]
         data = np.load(file_name)
 
@@ -146,7 +145,8 @@ class ThreePhaseBone(Dataset):
             input = data["data"]
         target = data["label"]
         mask = None if "mask" not in data else data["mask"]
-        # Get side based on custom file name (serial_side_tag.npz) e.g. 001_l_3.npz,
+
+        # filename: no_side_label.npz. e.g. 001_l_3.npz
         (boundary, side) = (
             (None, None)
             if "boundary" not in data
