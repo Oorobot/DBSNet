@@ -4,6 +4,8 @@
 > European Radiology, [https://doi.org/10.1007/s00330-023-09687-w](https://doi.org/10.1007/s00330-023-09687-w)
 
 ---
-![DBS-eNet](framework.png "The overall framework proposed in this study contains data preprocessing and a deep learning–based, multi-features neural network model (DBS-eNet)")
-**The overall framework proposed in this study contains data preprocessing and a deep learning–based, multi-features neural network model (DBS-eNet)**
+##  The framework that contains data preprocessing and DBS-eNet
+
+![framework](./framework.png)
+
 ---
